@@ -14,6 +14,7 @@ export const getAllBarang = async (req: Request, res: Response) => {
       FROM inv_barang b
       LEFT JOIN inv_lokasi l ON b.lokasi_id = l.replid
       LEFT JOIN inv_kategori k ON b.kategori_id = k.replid
+      ORDER BY b.replid DESC
     `;
     const [rows] = await db.query(query);
     return sendSuccess(res, 'Berhasil mengambil data barang', rows);
@@ -51,7 +52,7 @@ export const getBarangById = async (req: Request, res: Response) => {
   }
 };
 
-// GET /api/v1/barang
+// 3. Get Barang Tersedia (Digunakan untuk Dropdown / Pilihan UI Peminjaman & Transaksi)
 export const getBarangTersedia = async (req: Request, res: Response) => {
   try {
     const db = await dbPromise;
@@ -64,19 +65,21 @@ export const getBarangTersedia = async (req: Request, res: Response) => {
         b.kondisi,
         b.satuan,
         l.replid AS lokasi_id,
-        l.nama AS nama_lokasi
+        l.nama_ruangan AS nama_lokasi
       FROM inv_barang b
       LEFT JOIN inv_lokasi l ON b.lokasi_id = l.replid
       WHERE b.jumlah_tersedia > 0
+      ORDER BY b.nama_barang ASC
     `);
 
-    return sendSuccess(res, 'Berhasil mengambil daftar barang', rows);
+    return sendSuccess(res, 'Berhasil mengambil daftar barang tersedia', rows);
   } catch (error: any) {
-    return sendError(res, error.message, 500);
+    console.error('Get Barang Tersedia Error:', error);
+    return sendError(res, error.message || 'Gagal mengambil data barang tersedia', 500);
   }
 };
 
-// 3. Tambah Barang Baru
+// 4. Tambah Barang Baru
 export const createBarang = async (req: Request, res: Response) => {
   try {
     const { 
@@ -125,7 +128,7 @@ export const createBarang = async (req: Request, res: Response) => {
   }
 };
 
-// 4. Update Data Barang
+// 5. Update Data Barang
 export const updateBarang = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -165,7 +168,7 @@ export const updateBarang = async (req: Request, res: Response) => {
   }
 };
 
-// 5. Hapus Barang
+// 6. Hapus Barang
 export const deleteBarang = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -182,7 +185,7 @@ export const deleteBarang = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error('Delete Barang Error:', error);
     if (error.errno === 1451) {
-       return sendError(res, 'Tidak bisa menghapus barang karena sedang terkait dengan data peminjaman atau mutasi', 400);
+      return sendError(res, 'Tidak bisa menghapus barang karena sedang terkait dengan data peminjaman, barang masuk, atau barang keluar', 400);
     }
     return sendError(res, 'Gagal menghapus barang', 500, error.message);
   }

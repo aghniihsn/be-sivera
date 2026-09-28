@@ -7,6 +7,8 @@ import barangRoutes from './routes/barang.routes';
 import kategoriRoutes from './routes/kategori.routes';
 import pelajaranRoutes from './routes/pelajaran.routes';
 import peminjamanRoutes from './routes/peminjaman.routes';
+import barangMasukRoutes from './routes/barang-masuk.routes';
+import barangKeluarRoutes from './routes/barang-keluar.routes';
 
 dotenv.config();
 
@@ -33,6 +35,8 @@ app.use('/api/v1/kategori', kategoriRoutes);
 app.use('/api/v1/barang', barangRoutes);
 app.use('/api/v1/pelajaran', pelajaranRoutes);
 app.use('/api/v1/peminjaman', peminjamanRoutes);
+app.use('/api/v1/barang-masuk', barangMasukRoutes);
+app.use('/api/v1/barang-keluar', barangKeluarRoutes);
 
 
 // App Listener
